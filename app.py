@@ -80,7 +80,7 @@ def generate_docx():
             document.add_paragraph(f'{key}: {value}')
         document.save(docx_path)
         return send_file(docx_path, as_attachment=True)
-    return 'No data available to generate document'
+    return 'Arikitarakuma'
 
 
 if __name__ == '__main__':
