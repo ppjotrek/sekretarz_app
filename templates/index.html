@@ -4,87 +4,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sekretarz5000</title>
-    <style>
-        .container {
-            display: flex;
-        }
-        .form-container, .preview-container {
-            width: 50%;
-            padding: 20px;
-        }
-        .preview-container {
-            border-left: 1px solid #ccc;
-        }
-    </style>
+    <title>Usprawiedliwiacz</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
     <script>
         function toggleDateInputs() {
             const singleDate = document.getElementById('single-date');
             const rangeDates = document.getElementById('range-dates');
             if (document.getElementById('single').checked) {
-                singleDate.style.display = 'block';
+                singleDate.style.display = 'flex';
                 rangeDates.style.display = 'none';
             } else {
                 singleDate.style.display = 'none';
-                rangeDates.style.display = 'block';
+                rangeDates.style.display = 'flex';
             }
         }
     </script>
 </head>
 <body>
-    <div class="content">
-        <h1>Sekretarz5000</h1>
-        <p>Witaj w aplikacji Sekretarz5000. Wybierz plik z beściakami, podaj informacje o evencie i wygeneruj usprawiedliwienia.</p>
-    <div class="container">
-        <div class="form-container">
-            <h1>Excel z beściakami i Informacje o evencie:</h1>
-            <form action="{{ url_for('upload_and_submit') }}" method="post" enctype="multipart/form-data">
-                <label for="file">Wybierz plik:</label>
-                <input type="file" name="file" accept=".xlsx,.xls,.csv">
-                <br>
-                <label for="project-dropdown">Projekt:</label>
-                <select name="project-dropdown" id="project-dropdown">
-                    <option value="itp">ITP</option>
-                    <option value="bh">BITEhack</option>
-                    <option value="rcdc">RCDC</option>
-                </select>
-                <br>
-                <label>
-                    <input type="radio" name="date_option" value="single" id="single" onclick="toggleDateInputs()" checked> Jedna data
-                </label>
-                <label>
-                    <input type="radio" name="date_option" value="range" id="range" onclick="toggleDateInputs()"> Zakres dat
-                </label>
-                <br>
-                <div id="single-date">
-                    <label for="date">Data:</label>
-                    <input type="date" name="date" id="date">
-                </div>
-                <div id="range-dates" style="display: none;">
-                    <label for="start_date">Od:</label>
-                    <input type="date" name="start_date" id="start_date">
+    <div class=background>
+        <div class="content">
+            <div class="header">
+                <img src="static/text.gif" alt="Sekretarz5000" class="logo">
+                <p>Popatrz sobie na kwiatki, zanim Cię popierdoli.</p>
+            </div>
+        <div class="container">
+            <div class="form-container">
+                <h1>Excel z beściakami i Informacje o evencie:</h1>
+                <form action="{{ url_for('upload_and_submit') }}" method="post" enctype="multipart/form-data">
+                    <label for="file">Wybierz plik:</label>
+                    <input type="file" name="file" accept=".xlsx,.xls,.csv">
                     <br>
-                    <label for="end_date">Do:</label>
-                    <input type="date" name="end_date" id="end_date">
-                </div>
-                <br>
-                <input type="submit" value="Submit">
+                    <label for="project-dropdown">Projekt:</label>
+                    <select name="project-dropdown" id="project-dropdown">
+                        <option value="itp">ITP</option>
+                        <option value="bh">BITEhack</option>
+                        <option value="rcdc">RCDC</option>
+                    </select>
+                    <br>
+                    <label>
+                        <input type="radio" name="date_option" value="single" id="single" onclick="toggleDateInputs()" checked> Jedna data
+                    </label>
+                    <label>
+                        <input type="radio" name="date_option" value="range" id="range" onclick="toggleDateInputs()"> Zakres dat
+                    </label>
+                    <br>
+                    <div id="single-date">
+                        <input type="date" name="date" id="date">
+                    </div>
+                    <div id="range-dates" style="display:none;" class="date-inputs">
+                        <input type="date" name="start_date" id="start_date">
+                        <br>
+                        <input type="date" name="end_date" id="end_date">
+                    </div>
+                    <br>
+                    <input type="submit" value="Zatwierdź">
+                </form>
+            </div>
+        </div>
+        <div class="button-container">
+            <h1>Generuj usprawiedliwienia</h1>
+            <form action="{{ url_for('generate_docx') }}" method="get">
+                <input type="submit" value="Generuj">
             </form>
         </div>
-        <div class="preview-container">
-            <h1>Podgląd pisma</h1>
-            chuja tam, nic tu nie będzie
         </div>
-    </div>
-    <div class="form-container">
-        <h1>Generuj usprawiedliwienia</h1>
-        <form action="{{ url_for('generate_docx') }}" method="get">
-            <input type="submit" value="Generuj">
-        </form>
-    </div>
     </div>
 </body>
 <footer>
-    From ppjotrek with love
+    <a href="https://github.com/ppjotrek" class="footer-link">From ppjotrek with 💜</a>
 </footer>
 </html>

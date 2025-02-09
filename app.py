@@ -1,10 +1,11 @@
 from flask import Flask, request, redirect, url_for, session, render_template, send_file
 import pandas as pd
 from werkzeug.utils import secure_filename
-import os
-from docx import Document
 from docxtpl import DocxTemplate
-
+from docx import Document
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+import os
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -61,14 +62,43 @@ def generate_docx():
     if 'data' in session and 'additional_data' in session:
         data = session['data']
         additional_data = session['additional_data']
-        doc = DocxTemplate(os.path.join("docx_templates", "templatka.docx"))
-        #for count in data['Imię']:         #nie działa - nie pobiera nic, chyba musi być w returnie, więc albo jakoś to ogarnać subrutyną albo zip
-        count = 0
-        docs_name = additional_data['project-dropdown'] + data['Nazwisko'][str(count)] + '.docx' 
+        combined_doc = Document()
+
+        for count in range(len(data['Imię'])):
+            # Załaduj szablon dokumentu
+            template = DocxTemplate(os.path.join("docx_templates", "templatka.docx"))
+            context = {
+                'imie': data['Imię'][str(count)],
+                'nazwisko': data['Nazwisko'][str(count)],
+                'numer_indeksu': data['Numer indeksu'][str(count)],
+                'data': additional_data['date'],
+                'event': additional_data['project-dropdown']
+            }
+            template.render(context)
+            
+            # Zapisz tymczasowy dokument
+            temp_doc_path = os.path.join(app.config['UPLOAD_FOLDER'], f'temp_{count}.docx')
+            template.save(temp_doc_path)
+            
+            # Otwórz tymczasowy dokument i dodaj jego zawartość do głównego dokumentu
+            temp_doc = Document(temp_doc_path)
+            for element in temp_doc.element.body:
+                combined_doc.element.body.append(element)
+            
+            # Dodaj nową sekcję, aby rozpocząć nową stronę
+            if count < len(data['Imię']) - 1:
+                page_break = OxmlElement('w:br')
+                page_break.set(qn('w:type'), 'page')
+                combined_doc.element.body.append(page_break)
+        
+        docs_name = additional_data['project-dropdown'] + '_combined.docx'
         docx_path = os.path.join(app.config['UPLOAD_FOLDER'], docs_name)
-        context = { 'imie' : data['Imię'][str(count)], 'nazwisko' : data['Nazwisko'][str(count)], 'numer_indeksu' : data['Numer indeksu'][str(count)], 'data' : additional_data['date'] }
-        doc.render(context)
-        doc.save(docx_path)
+        combined_doc.save(docx_path)
+        
+        # Usuń tymczasowe pliki
+        for count in range(len(data['Imię'])):
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], f'temp_{count}.docx'))
+        
         return send_file(docx_path, as_attachment=True)
     return 'Arikitarakuma'
 
