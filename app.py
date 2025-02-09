@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, session, render_template, send_file
+from flask import Flask, request, redirect, url_for, session, render_template, send_file, jsonify
 import pandas as pd
 from werkzeug.utils import secure_filename
 from docxtpl import DocxTemplate
@@ -6,6 +6,7 @@ from docx import Document
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 import os
+import json
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -14,13 +15,14 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 @app.route('/')
 def index():
-    combined_data = {}
-    if 'data' in session:
-        df = pd.DataFrame.from_dict(session['data'])
-        combined_data['data'] = df.to_dict()
-    if 'additional_data' in session:
-        combined_data['additional_data'] = session['additional_data']
-    return render_template('index.html', combined_data=combined_data)
+    file_path = os.path.join('docx_templates', 'projects.json')
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as file:
+            projects = json.load(file)
+    else:
+        projects = {}
+
+    return render_template('index.html', projects=projects)
 
 @app.route('/upload_and_submit', methods=['POST'])
 def upload_and_submit():
@@ -101,6 +103,29 @@ def generate_docx():
         
         return send_file(docx_path, as_attachment=True)
     return 'Arikitarakuma'
+
+@app.route('/add_project', methods=['POST'])
+def add_project():
+    data = request.get_json()
+    project_name = data.get('name')
+    project_description = data.get('description')
+
+    if project_name and project_description:
+        file_path = os.path.join('docx_templates', 'projects.json')
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                projects = json.load(file)
+        else:
+            projects = {}
+
+        projects[project_name] = project_description
+
+        with open(file_path, 'w') as file:
+            json.dump(projects, file, indent=4)
+
+        return jsonify(success=True)
+    else:
+        return jsonify(success=False), 400
 
 if __name__ == '__main__':
     app.run(debug=True)

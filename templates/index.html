@@ -21,6 +21,52 @@
                 rangeDates.style.display = 'flex';
             }
         }
+
+        function showAddProjectForm() {
+            document.getElementById('add-project-form').style.display = 'block';
+        }
+
+        function hideAddProjectForm() {
+            const projectName = document.getElementById('new-project-name').value;
+            const projectDescription = document.getElementById('new-project-description').value;
+            if (!projectName && !projectDescription) {
+                document.getElementById('add-project-form').style.display = 'none';
+            }
+        }
+        
+        function addProject() {
+            const projectName = document.getElementById('new-project-name').value;
+            const projectDescription = document.getElementById('new-project-description').value;
+        
+            if (projectName && projectDescription) {
+                fetch('/add_project', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: projectName,
+                        description: projectDescription
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Projekt został dodany!');
+                        document.getElementById('add-project-form').style.display = 'none';
+                        const projectDropdown = document.getElementById('project-dropdown');
+                        const newOption = document.createElement('option');
+                        newOption.value = projectName.toLowerCase();
+                        newOption.text = projectName;
+                        projectDropdown.add(newOption);
+                    } else {
+                        alert('Wystąpił błąd podczas dodawania projektu.');
+                    }
+                });
+            } else {
+                alert('Proszę wypełnić wszystkie pola.');
+            }
+        }
     </script>
 </head>
 <body>
@@ -32,16 +78,15 @@
             </div>
         <div class="container">
             <div class="form-container">
-                <h1>Excel z beściakami i Informacje o evencie:</h1>
                 <form action="{{ url_for('upload_and_submit') }}" method="post" enctype="multipart/form-data">
                     <label for="file">Wybierz plik:</label>
                     <input type="file" name="file" accept=".xlsx,.xls,.csv">
                     <br>
                     <label for="project-dropdown">Projekt:</label>
                     <select name="project-dropdown" id="project-dropdown">
-                        <option value="itp">ITP</option>
-                        <option value="bh">BITEhack</option>
-                        <option value="rcdc">RCDC</option>
+                        {% for project_name, project_description in projects.items() %}
+                            <option value="{{ project_name|lower }}">{{ project_name }}</option>
+                        {% endfor %}
                     </select>
                     <br>
                     <label>
@@ -63,6 +108,22 @@
                     <input type="submit" value="Zatwierdź">
                 </form>
             </div>
+        </div>
+        <div class="button-container">
+            <button onclick="showAddProjectForm()" id="newprojbutton">Dodaj nowy projekt</button>
+        </div>
+        <div id="add-project-form" style="display:none;">
+            <h2>Dodaj nowy projekt</h2>
+            <form id="new-project-form">
+                <label for="new-project-name">Nazwa projektu:</label>
+                <input type="text" id="new-project-name" name="new-project-name">
+                <br>
+                <label for="new-project-description">Opis projektu:</label>
+                <textarea id="new-project-description" name="new-project-description"></textarea>
+                <br>
+                <button type="button" onclick="addProject()" class="new-project-button">Dodaj projekt</button>
+                <button type="button" onclick="hideAddProjectForm()" class="new-project-button">Anuluj</button>
+            </form>
         </div>
         <div class="button-container">
             <h1>Generuj usprawiedliwienia</h1>
