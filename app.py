@@ -1,4 +1,7 @@
-from flask import Flask, request, redirect, url_for, session, render_template, send_file, jsonify
+from flask import Flask, request, redirect, url_for, session, render_template, send_file, jsonify, flash
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 from werkzeug.utils import secure_filename
 from docxtpl import DocxTemplate
@@ -11,9 +14,31 @@ import json
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.secret_key = 'supersecretkey'  # Ustaw klucz sesji
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+# Konfiguracja Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+# Konfiguracja SQLAlchemy
+db = SQLAlchemy(app)
+
+# Model użytkownika
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+    phone_number = db.Column(db.String(50), nullable=False)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 @app.route('/')
+@login_required
 def index():
     file_path = os.path.join('docx_templates', 'projects.json')
     if os.path.exists(file_path):
@@ -24,7 +49,44 @@ def index():
 
     return render_template('index.html', projects=projects)
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        phone = request.form['phone']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            flash('Email already registered')
+            return redirect(url_for('register'))
+        hashed_password = generate_password_hash(password)
+        new_user = User(email=email, password=hashed_password, phone_number=phone)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Registration successful')
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('index'))
+        flash('Invalid email or password')
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 @app.route('/upload_and_submit', methods=['POST'])
+@login_required
 def upload_and_submit():
     if 'file' not in request.files:
         return 'No file part'
@@ -60,6 +122,7 @@ def upload_and_submit():
     return redirect(url_for('index'))
 
 @app.route('/generate_docx')
+@login_required
 def generate_docx():
     if 'data' in session and 'additional_data' in session:
         data = session['data']
@@ -105,6 +168,7 @@ def generate_docx():
     return 'Arikitarakuma'
 
 @app.route('/add_project', methods=['POST'])
+@login_required
 def add_project():
     data = request.get_json()
     project_name = data.get('name')

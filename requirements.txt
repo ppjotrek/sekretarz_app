@@ -4,3 +4,5 @@ werkzeug
 python-docx
 docxtpl
 openpyxl
+Flask-Login
+Flask-SQLAlchemy

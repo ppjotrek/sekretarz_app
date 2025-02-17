@@ -48,7 +48,6 @@ h1 {
     margin: 0 auto;
 }
 
-
 .form-container form {
     width: 100%;
 }
@@ -69,7 +68,8 @@ h1 {
 .form-container select,
 .form-container input[type="date"],
 .form-container input[type="text"],
-.from-container input[type="dropdown"],
+.form-container input[type="email"],
+.form-container input[type="password"],
 .form-container textarea {
     width: 100%;
     padding: 10px;
@@ -77,23 +77,9 @@ h1 {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
-.form-container input[type="submit"]{
-    width: 100%;
-}
-.form-container input[type="file"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.form-container input[type="radio"] {
-    width: auto;
-    margin-right: 10px;
-}
 
 .form-container input[type="submit"] {
+    width: 100%;
     background-color: #C5766D;
     color: white;
     padding: 10px 20px;
@@ -126,6 +112,7 @@ h1 {
     text-align: center;
     margin-bottom: 20px;
 }
+
 .button-container {
     border-radius: 8px;
     max-width: 500px;
