@@ -1,6 +1,18 @@
 {
-    "ITP": "In\u017cynierskie Targi Pracy",
-    "BITEhack": "Hackathon czy co\u015b tam",
-    "RCDC": "Remote Car Design Challenge",
-    "do wpisania r\u0119cznie": ""
+    "ITP": {
+        "nazwa" : "In\u017cynierskie Targi Pracy",
+        "opis" : "targi pracy"
+    },
+    "BITEhack": {
+        "nazwa" : "BITEhack",
+        "opis" : "hackathon"
+    },
+    "RCDC": {
+        "nazwa" : "Remote Car Design Challenge",
+        "opis" : "konkurs"
+    },
+    "do wpisania r\u0119cznie": {
+        "nazwa" : "       ",
+        "opis" : "        "
+    }
 }

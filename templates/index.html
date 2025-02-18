@@ -66,7 +66,16 @@
             } else {
                 alert('Proszę wypełnić wszystkie pola.');
             }
-        }
+        };
+        document.addEventListener('DOMContentLoaded', function() {
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        alert("{{ message }}");
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        });
     </script>
 </head>
 <body>

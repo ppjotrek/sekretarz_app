@@ -32,6 +32,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     phone_number = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(150), nullable=False)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -129,15 +130,80 @@ def generate_docx():
         additional_data = session['additional_data']
         combined_doc = Document()
 
+        # Załaduj dane z projects.json
+        with open(os.path.join('docx_templates', 'projects.json'), 'r', encoding='utf-8') as file:
+            projects = json.load(file)
+
+        project_name = additional_data['project-dropdown']
+        project_info = projects.get(project_name, {})
+        nazwa_projektu = project_info.get('nazwa', '')
+        opis_projektu = project_info.get('opis', '')
+
         for count in range(len(data['Imię'])):
+            # Pobierz dane z sesji
+            imie_i_nazwisko = f"{data['Imię'][str(count)]} {data['Nazwisko'][str(count)]}"
+            album = data['Numer indeksu'][str(count)]
+            studenta_ki = data['Płeć'][str(count)]
+            kierunek = data['Kierunek'][str(count)]
+            wydzial = data['Wydział'][str(count)]
+            dniu_dniach = "dniu" if additional_data['date'] else "dniach"
+            data_wystawienia = additional_data['date']
+            daty = additional_data.get('start_date', '') + ' - ' + additional_data.get('end_date', '')
+            sekretarz = current_user.name
+            tel_sekretarz = current_user.phone_number
+            mail_sekretarz = current_user.email
+
+            # Sprawdź, czy wszystkie zmienne są ustawione
+            missing_variables = []
+            if not imie_i_nazwisko:
+                missing_variables.append('imie_i_nazwisko')
+            if not album:
+                missing_variables.append('album')
+            if not studenta_ki:
+                missing_variables.append('studenta_ki')
+            if not kierunek:
+                missing_variables.append('kierunek')
+            if not wydzial:
+                missing_variables.append('wydzial')
+            if not dniu_dniach:
+                missing_variables.append('dniu_dniach')
+            if not data_wystawienia:
+                missing_variables.append('data')
+            if not daty:
+                missing_variables.append('daty')
+            if not nazwa_projektu:
+                missing_variables.append('nazwa_projektu')
+            if not opis_projektu:
+                missing_variables.append('opis_projektu')
+            if not sekretarz:
+                missing_variables.append('sekretarz')
+            if not tel_sekretarz:
+                missing_variables.append('tel_sekretarz')
+            if not mail_sekretarz:
+                missing_variables.append('mail_sekretarz')
+
+            if missing_variables:
+                flash(f'Missing variables: {", ".join(missing_variables)}', 'error')
+                return redirect(url_for('index'))
+
             # Załaduj szablon dokumentu
             template = DocxTemplate(os.path.join("docx_templates", "templatka.docx"))
+
             context = {
-                'imie': data['Imię'][str(count)],
-                'nazwisko': data['Nazwisko'][str(count)],
-                'numer_indeksu': data['Numer indeksu'][str(count)],
-                'data': additional_data['date'],
-                'event': additional_data['project-dropdown']
+                'data': data_wystawienia,
+                'imie_i_nazwisko': imie_i_nazwisko,
+                'album': album,
+                'studenta_ki': studenta_ki,
+                'kierunek': kierunek,
+                'wydzial': wydzial,
+                'dniu_dniach': dniu_dniach,
+                'data': data_wystawienia,
+                'daty': daty,
+                'nazwa_projektu': nazwa_projektu,
+                'opis_projektu': opis_projektu,
+                'sekretarz': sekretarz,
+                'tel_sekretarz': tel_sekretarz,
+                'mail_sekretarz': mail_sekretarz
             }
             template.render(context)
             
