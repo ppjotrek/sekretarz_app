@@ -94,7 +94,7 @@
                     <label for="project-dropdown">Projekt:</label>
                     <select name="project-dropdown" id="project-dropdown">
                         {% for project_name, project_description in projects.items() %}
-                            <option value="{{ project_name|lower }}">{{ project_name }}</option>
+                            <option value="{{ project_name }}">{{ project_name }}</option>
                         {% endfor %}
                     </select>
                     <br>

@@ -33,6 +33,8 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(150), nullable=False)
     phone_number = db.Column(db.String(50), nullable=False)
     name = db.Column(db.String(150), nullable=False)
+    
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -53,6 +55,7 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        name = request.form['name']
         email = request.form['email']
         password = request.form['password']
         phone = request.form['phone']
@@ -61,7 +64,7 @@ def register():
             flash('Email already registered')
             return redirect(url_for('register'))
         hashed_password = generate_password_hash(password)
-        new_user = User(email=email, password=hashed_password, phone_number=phone)
+        new_user = User(name=name, email=email, password=hashed_password, phone_number=phone)
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful')
@@ -143,7 +146,7 @@ def generate_docx():
             # Pobierz dane z sesji
             imie_i_nazwisko = f"{data['Imię'][str(count)]} {data['Nazwisko'][str(count)]}"
             album = data['Numer indeksu'][str(count)]
-            studenta_ki = data['Płeć'][str(count)]
+            studenta_ki = "studenta" if data['Płeć'][str(count)] == 'Mężczyzna' else "studentki" if data['Płeć'][str(count)] == 'Kobieta' else "osoby studiującej na kierunku"
             kierunek = data['Kierunek'][str(count)]
             wydzial = data['Wydział'][str(count)]
             dniu_dniach = "dniu" if additional_data['date'] else "dniach"
@@ -187,7 +190,7 @@ def generate_docx():
                 return redirect(url_for('index'))
 
             # Załaduj szablon dokumentu
-            template = DocxTemplate(os.path.join("docx_templates", "templatka.docx"))
+            template = DocxTemplate(os.path.join("docx_templates", "template_v1.docx"))
 
             context = {
                 'data': data_wystawienia,

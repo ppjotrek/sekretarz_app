@@ -1,15 +1,15 @@
 {
     "ITP": {
         "nazwa" : "In\u017cynierskie Targi Pracy",
-        "opis" : "targi pracy"
+        "opis" : "opis itp"
     },
     "BITEhack": {
         "nazwa" : "BITEhack",
-        "opis" : "hackathon"
+        "opis" : "opis bitehacka"
     },
     "RCDC": {
         "nazwa" : "Remote Car Design Challenge",
-        "opis" : "konkurs"
+        "opis" : "opis rcdc"
     },
     "do wpisania r\u0119cznie": {
         "nazwa" : "       ",
