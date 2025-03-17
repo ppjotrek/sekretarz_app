@@ -1,3 +1,5 @@
+### TODO: PORZĄDNA DOKUMENTACJA XD
+
 Siema
 
 Apka do sekretarzowania
@@ -17,5 +19,3 @@ Zmienne do wpisania do templatki:
 - sekretarz - imię i nazwisko sekretarza
 - tel_sekretarz - numer telefonu sekretarza
 - mail_sekretarz - adres email sekretarza
-
-TODO: puste pola! Nie wszystkie parametry da się ustawić i się wywala

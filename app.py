@@ -10,6 +10,7 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 import os
 import json
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -139,19 +140,23 @@ def generate_docx():
 
         project_name = additional_data['project-dropdown']
         project_info = projects.get(project_name, {})
-        nazwa_projektu = project_info.get('nazwa', '')
+        nazwa_projektu = project_info.get('nazwa_format', '')
         opis_projektu = project_info.get('opis', '')
 
         for count in range(len(data['Imię'])):
             # Pobierz dane z sesji
+            print(data)
             imie_i_nazwisko = f"{data['Imię'][str(count)]} {data['Nazwisko'][str(count)]}"
             album = data['Numer indeksu'][str(count)]
-            studenta_ki = "studenta" if data['Płeć'][str(count)] == 'Mężczyzna' else "studentki" if data['Płeć'][str(count)] == 'Kobieta' else "osoby studiującej na kierunku"
-            kierunek = data['Kierunek'][str(count)]
+            studenta_ki = "studenta" if data['Płeć'][str(count)] == 'Beściak' else "studentki" if data['Płeć'][str(count)] == 'Beściara' else "osoby studiującej na "
+            kierunek = data['Kierunek '][str(count)] #ta spacja tu ma być jbc
             wydzial = data['Wydział'][str(count)]
             dniu_dniach = "dniu" if additional_data['date'] else "dniach"
-            data_wystawienia = additional_data['date']
-            daty = additional_data.get('start_date', '') + ' - ' + additional_data.get('end_date', '')
+            data_wystawienia = datetime.now().strftime('%d.%m.%Y')
+            if additional_data['date']:
+                daty = datetime.strptime(additional_data['date'], '%Y-%m-%d').strftime('%d.%m.%Y')
+            else:
+                daty = additional_data.get('start_date', '') + ' - ' + additional_data.get('end_date', '')
             sekretarz = current_user.name
             tel_sekretarz = current_user.phone_number
             mail_sekretarz = current_user.email
@@ -200,7 +205,6 @@ def generate_docx():
                 'kierunek': kierunek,
                 'wydzial': wydzial,
                 'dniu_dniach': dniu_dniach,
-                'data': data_wystawienia,
                 'daty': daty,
                 'nazwa_projektu': nazwa_projektu,
                 'opis_projektu': opis_projektu,

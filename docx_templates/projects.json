@@ -1,7 +1,8 @@
 {
     "ITP": {
         "nazwa" : "In\u017cynierskie Targi Pracy",
-        "opis" : "opis itp"
+        "nazwa_format" : "In\u017cynierskich Targów Pracy",
+        "opis" : "Inżynierskie Targi Pracy to corocznie organizowane wydarzenie, w którym studenci mogą porozmawiać z przedstawicielami firm, przedstawić im swoje CV oraz dowiedzieć się wszystkich niezbędnych informacji. Na Targach Pracy staramy się gromadzić atrakcyjne lokalne, ogólnopolskie i międzynarodowe firmy, w celu zaprezentowania profilu swej działalności, a przede wszystkim zachęcenia młodych oraz wykształconych inżynierów do ubiegania się o stanowisko w ich przedsiębiorstwach. "
     },
     "BITEhack": {
         "nazwa" : "BITEhack",
